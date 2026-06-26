@@ -1,30 +1,26 @@
-package newteamcode;
+package org.firstinspires.ftc.teamcode;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
-import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-
-@Config
-@TeleOp
+@TeleOp(name = "normal1", group = "TeleOp")
 public class normal1 extends LinearOpMode {
-    public static  float stopperpos;
+
     private DcMotor    motor1;   // DTKanan
     private DcMotor    motor2;   // DTkiri
     private DcMotor    motor3;   // Intake Mandiri (BallFeed)
     private DcMotor    motor4;   // HookSlide
-    private DcMotor    motor5;   // Slider Struktur Shooter (SlideShoot)
+    private DcMotor    motor5;   // Carry
     private DcMotorEx  motor6;   // HookLift
     private DcMotorEx  motor7;   // Shooter1 (Kanan)
     private DcMotorEx  motor8;   // Shooter2 (Kiri)
-    private Servo      stopper;
 
+    private CRServo Lfeeder, Rfeeder, SlideLock;
     private static final int    LIFT_TICKS        = 400;
     private static final double LIFT_POWER        = 0.8;
     private static final double SLIDE_SHOOT_POWER = 1.0;
@@ -39,7 +35,7 @@ public class normal1 extends LinearOpMode {
     private boolean liftUp    = false;
     private boolean lastDU     = false;
     private boolean lastDD     = false;
-    private boolean lastY1     = false; // Menggunakan lastY1 untuk Driver 1
+    private boolean lastY1     = false;
     private boolean shooterOn = false;
 
     private static final double TICKS_PER_REV = 28.0;
@@ -52,12 +48,15 @@ public class normal1 extends LinearOpMode {
         motor2 = hardwareMap.get(DcMotor.class,   "DTKiri");
         motor3 = hardwareMap.get(DcMotor.class,   "Intake");
         motor4 = hardwareMap.get(DcMotor.class,   "HookSlide");
-        motor5 = hardwareMap.get(DcMotor.class,   "SlideShoot");
+        motor5 = hardwareMap.get(DcMotor.class,   "Carry");
         motor6 = hardwareMap.get(DcMotorEx.class, "HookLift");
         motor7 = hardwareMap.get(DcMotorEx.class, "Shooter1");
-        hardwareMap.get(DcMotorEx.class, "Shooter2");
         motor8 = hardwareMap.get(DcMotorEx.class, "Shooter2");
-        stopper = hardwareMap.get(Servo.class,    "Stopper");
+
+        Rfeeder = hardwareMap.get(CRServo.class, "Rfeeder");
+        Lfeeder = hardwareMap.get(CRServo.class, "Lfeeder");
+        SlideLock = hardwareMap.get(CRServo.class, "SlideLock");
+
 
         // --- 2. MOTOR DIRECTION ---
         motor1.setDirection(DcMotor.Direction.FORWARD);
@@ -66,9 +65,9 @@ public class normal1 extends LinearOpMode {
         motor4.setDirection(DcMotor.Direction.FORWARD);
         motor5.setDirection(DcMotor.Direction.FORWARD);
         motor6.setDirection(DcMotor.Direction.REVERSE);
+        Lfeeder.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        // Sesuai permintaan: Keduanya diset FORWARD secara hardware
-        motor7.setDirection(DcMotor.Direction.FORWARD);
+        motor7.setDirection(DcMotor.Direction.REVERSE);
         motor8.setDirection(DcMotor.Direction.FORWARD);
 
         // --- 3. ZERO POWER BEHAVIOR ---
@@ -87,7 +86,6 @@ public class normal1 extends LinearOpMode {
         motor7.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motor8.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        // Injeksi koefisien PIDF Shooter
         PIDFCoefficients pidfCoeffs = new PIDFCoefficients(VELO_P, VELO_I, VELO_D, VELO_F);
         motor7.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoeffs);
         motor8.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoeffs);
@@ -116,11 +114,25 @@ public class normal1 extends LinearOpMode {
             }
             motor1.setPower(leftPower);
             motor2.setPower(rightPower);
-            // ── Stopper Servo Control (GP2 - Tombol B) ────────────────
+
+            // ── Feeder CR Servo Control (GP2 - X / B) ────────────────
             if (gamepad2.x) {
-                stopper.setPosition(0.5);
+                Rfeeder.setPower(1.0);
+                Lfeeder.setPower(1.0);
             } else if (gamepad2.b) {
-                stopper.setPosition(0.15);
+                Rfeeder.setPower(-1.0);
+                Lfeeder.setPower(-1.0);
+            } else {
+                Rfeeder.setPower(0.0);
+                Lfeeder.setPower(0.0);
+            }
+            // ── SlideLock CR Servo Control (GP2 - X / B) ────────────────
+            if (gamepad2.y) {
+                SlideLock.setPower(1.0);
+            } else if (gamepad2.a) {
+                SlideLock.setPower(-1.0);
+            } else {
+                SlideLock.setPower(0.0);
             }
             // ── Kontrol Intake Mandiri (GP1 - LT / RT) ────────────────
             double feedForwardPower = gamepad1.right_trigger;
@@ -134,8 +146,7 @@ public class normal1 extends LinearOpMode {
                 motor3.setPower(0.0);
             }
 
-            // ── Kontrol Shooter Campuran (GP1 - Toggle Y & GP2 Trigger Manual) ──
-            // Pindah pembacaan toggle otomatis ke gamepad1.y
+
             boolean currentY1 = gamepad1.y;
             if (currentY1 && !lastY1) {
                 shooterOn = !shooterOn;
@@ -146,37 +157,28 @@ public class normal1 extends LinearOpMode {
             double shootManualOut = gamepad2.left_trigger;
 
             if (shooterOn) {
-                // Mode Otomatis Aktif (M7 positif, M8 dinegatifkan secara software agar berputar berhadapan)
                 motor7.setVelocity(TARGET_SHOOTER_VELO);
-                motor8.setVelocity(-TARGET_SHOOTER_VELO);
+                motor8.setVelocity(TARGET_SHOOTER_VELO);
             } else if (shootManualIn > 0.1) {
-                // Kontrol Manual Maju via Right Trigger GP2
                 motor7.setPower(shootManualIn);
-                motor8.setPower(-shootManualIn);
+                motor8.setPower(shootManualIn);
             } else if (shootManualOut > 0.1) {
-                // Kontrol Manual Mundur via Left Trigger GP2
                 motor7.setPower(-shootManualOut);
-                motor8.setPower(shootManualOut);
+                motor8.setPower(-shootManualOut);
             } else {
                 motor7.setPower(0.0);
                 motor8.setPower(0.0);
             }
 
-            // ── Slider Struktur Shooter Mandiri (GP2 - Tombol Y / A) ──
-            // Sesuai permintaan: Y untuk naik/maju, A untuk turun/mundur
-            double slideShootPower = 0.0;
-            if (gamepad2.y) {
-                slideShootPower = SLIDE_SHOOT_POWER;
-            } else if (gamepad2.a) {
-                slideShootPower = -SLIDE_SHOOT_POWER;
-            }
-            motor5.setPower(slideShootPower);
-
             // ── HookSlide Control (GP2 - Left Stick) ──────────────────
-            double hookPower = -gamepad2.left_stick_y;
+            double hookPower = gamepad2.left_stick_y;
             motor4.setPower(hookPower);
 
-            // ── HookLift Auto/Manual Control (GP2) ────────────────────
+            // ── Carry Control (GP2 - Left Stick) ──────────────────
+            double carryPower = gamepad2.right_stick_y;
+            motor5.setPower(carryPower);
+
+            // ── HookLift Auto/Manual Contrsol (GP2 - Bumper/Dpad) ──────
             boolean duPressed = gamepad2.dpad_up   && !lastDU;
             boolean ddPressed = gamepad2.dpad_down && !lastDD;
 
@@ -218,25 +220,14 @@ public class normal1 extends LinearOpMode {
             telemetry.addData("Intake Power", "%.2f", motor3.getPower());
 
             telemetry.addLine("---- Shooter System ----");
-            telemetry.addData("Auto Status (GP1-Y)", shooterOn ? "ON (Auto 3000 RPM)" : "OFF");
-            telemetry.addData("Manual RT (Maju)", "%.2f", shootManualIn);
-            telemetry.addData("Manual LT (Mundur)", "%.2f", shootManualOut);
+            telemetry.addData("Auto Status (GP1-Y)", shooterOn ? "ON" : "OFF");
             telemetry.addData("M7 Real Speed", "%.0f RPM", rpmM7);
             telemetry.addData("M8 Real Speed", "%.0f RPM", rpmM8);
 
-            telemetry.addLine("---- Slider & Hook Mechanisms ----");
-            telemetry.addData("Slider M5 (GP2 Y/A)", "%.2f", motor5.getPower());
+            telemetry.addLine("---- Mechanisms ----");
+            telemetry.addData("Slider M5 (Y/A)", "%.2f", motor5.getPower());
             telemetry.addData("HookSlide Pwr", "%.2f", hookPower);
-
-            telemetry.addLine("---- Stopper Servo ----");
-            telemetry.addData("Stopper Button", gamepad2.b ? "ACTIVE (B)" : "RELEASED");
-
-            FtcDashboard dashboard = FtcDashboard.getInstance();
-            Telemetry dashboardTelemetry = dashboard.getTelemetry();
-
-            dashboardTelemetry.addData("servopos",stopper.getPosition());
-            dashboardTelemetry.addData("M7 Real Speed", "%.0f RPM", rpmM7);
-            dashboardTelemetry.update();
+            telemetry.addData("CR Slider", gamepad2.dpad_left ? "KIRI" : (gamepad2.dpad_right ? "KANAN" : "STOP"));
 
             telemetry.update();
         }

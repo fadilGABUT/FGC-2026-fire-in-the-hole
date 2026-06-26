@@ -144,8 +144,7 @@ public class testing extends OpMode {
                 ShooterKiri.setPower(0.0);
             }
 
-            // ── Slider Struktur Shooter Mandiri (GP2 - Tombol Y / A) ──
-            // Sesuai permintaan: Y untuk naik/maju, A untuk turun/mundur
+            // ── Shooter (GP2 - Tombol Y )
             if (gamepad2.y) {
                 SlideShoot.setPower(SLIDE_SHOOT_POWER);
             } else if (gamepad2.a) {
