@@ -1,5 +1,6 @@
-package org.firstinspires.ftc.teamcode;
+package newteamcode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -7,6 +8,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @TeleOp(name = "normal1", group = "TeleOp")
 public class normal1 extends LinearOpMode {
@@ -25,12 +28,12 @@ public class normal1 extends LinearOpMode {
     private static final double LIFT_POWER        = 0.8;
     private static final double SLIDE_SHOOT_POWER = 1.0;
 
-    private static final double TARGET_SHOOTER_VELO = 1800.0;
+    public static final double TARGET_SHOOTER_VELO = 1800.0;
 
-    private static final double VELO_P = 180.0;
-    private static final double VELO_I = 0.0;
-    private static final double VELO_D = 0.0;
-    private static final double VELO_F = 14.0;
+    public static final double VELO_P = 180.0;
+    public static final double VELO_I = 0.0;
+    public static final double VELO_D = 0.0;
+    public static final double VELO_F = 14.0;
 
     private boolean liftUp    = false;
     private boolean lastDU     = false;
@@ -228,7 +231,12 @@ public class normal1 extends LinearOpMode {
             telemetry.addData("Slider M5 (Y/A)", "%.2f", motor5.getPower());
             telemetry.addData("HookSlide Pwr", "%.2f", hookPower);
             telemetry.addData("CR Slider", gamepad2.dpad_left ? "KIRI" : (gamepad2.dpad_right ? "KANAN" : "STOP"));
+            FtcDashboard dashboard = FtcDashboard.getInstance();
+            Telemetry dashboardTelemetry = dashboard.getTelemetry();
 
+            dashboardTelemetry.addData("Shooter RPM", "%.0f RPM", currentVeloM7);
+            dashboardTelemetry.addData("target shooter RPM", TARGET_SHOOTER_VELO);
+            dashboardTelemetry.update();
             telemetry.update();
         }
     }
