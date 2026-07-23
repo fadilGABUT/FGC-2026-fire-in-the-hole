@@ -5,14 +5,14 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class multi1 {
-    public DcMotor DTR,DTL,Int;
+    public DcMotor DTR,DTL,Intake;
     double forward, turn;
     public void init(HardwareMap hwmap){
 
         DTR = hwmap.get(DcMotor.class,   "DTR");
         DTL = hwmap.get(DcMotor.class,   "DTL");
         DTR.setDirection(DcMotor.Direction.REVERSE);
-        Int = hwmap.get(DcMotor.class, "Int");
+        Intake = hwmap.get(DcMotor.class, "Int");
     }
     public void loop(Gamepad gamepad){
 
@@ -30,6 +30,6 @@ public class multi1 {
         DTR.setPower(leftPower);
         DTL.setPower(rightPower);
         double intakePower = gamepad.right_trigger - gamepad.left_trigger;
-        Int.setPower(intakePower);
+        Intake.setPower(intakePower);
     }
 }

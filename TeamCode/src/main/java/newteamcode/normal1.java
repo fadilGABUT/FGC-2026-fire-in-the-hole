@@ -24,17 +24,15 @@ public class normal1 extends LinearOpMode {
     private DcMotor    Feed;
     private DcMotorEx  ShooterL;
 
-    public DcMotor Storage1;
-    private DcMotor Storage2;
 
     public static double TURN_MULTIPLIER = 0.5;
 
     public static  double TARGET_SHOOTER_VELO = 1700.0;
     public static double MIN_SHOOTER_VELO = 1500.0;
-    public static  double VELO_P = 180.0;
+    public static  double VELO_P = 0;
     public static final double VELO_I = 0.0;
     public static final double VELO_D = 0.0;
-    public static  double VELO_F = 15.0;
+    public static  double VELO_F = 16.221;
     public static double FEED_TRIGGER_RPM = 1800.0;
 
     private boolean lastRB     = false;
@@ -51,8 +49,6 @@ public class normal1 extends LinearOpMode {
         Int = hardwareMap.get(DcMotor.class,   "Int");
         Feed = hardwareMap.get(DcMotor.class,   "Feed");
         ShooterL = hardwareMap.get(DcMotorEx.class, "ShooterL");
-        Storage1 = hardwareMap.get(DcMotor.class, "Storage1");
-        Storage2 = hardwareMap.get(DcMotor.class, "Storage2");
         // MOTOR DIRECTION
         DTR.setDirection(DcMotor.Direction.REVERSE);
         DTL.setDirection(DcMotor.Direction.FORWARD);
@@ -66,7 +62,6 @@ public class normal1 extends LinearOpMode {
         Int.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         Feed.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         ShooterL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        Storage1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
 
@@ -75,14 +70,15 @@ public class normal1 extends LinearOpMode {
         Feed.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         ShooterL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        PIDFCoefficients pidfCoeffs = new PIDFCoefficients(VELO_P, VELO_I, VELO_D, VELO_F);
-        ShooterL.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoeffs);
+
+
 
         telemetry.addData("Status", "Robot Ready");
         telemetry.update();
 
         waitForStart();
         while (opModeIsActive()) {
+            ShooterL.setVelocityPIDFCoefficients(VELO_P,VELO_I,VELO_D,VELO_F);
             ElapsedTime looptimer = new ElapsedTime();
             double Looptimer = looptimer.milliseconds();
             looptimer.reset();
@@ -122,21 +118,6 @@ public class normal1 extends LinearOpMode {
             double intakePower = gamepad1.right_trigger - gamepad1.left_trigger;
             Int.setPower(intakePower);
 
-            // ── Storage
-            if (gamepad2.x) {
-                Storage1.setPower(0.5);
-            } else if (gamepad2.y) {
-                Storage1.setPower(-0.5);
-            } else {
-                Storage1.setPower(0.0);
-
-            if (gamepad2.b) {
-                Storage2.setPower(1.0);
-            } else if (gamepad2.a) {
-                Storage2.setPower(-1.0);
-            } else {
-                Storage2.setPower(0.0);
-            }
 
             // ── Shooter (GP2 - BUMPER)
             boolean currentRB = gamepad2.right_bumper;
@@ -196,4 +177,3 @@ public class normal1 extends LinearOpMode {
         }
     }
 }
-    }
