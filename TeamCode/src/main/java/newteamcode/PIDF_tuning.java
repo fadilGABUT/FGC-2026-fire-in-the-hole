@@ -38,6 +38,8 @@ public class PIDF_tuning extends OpMode {
             }
         } else if (gamepad1.x) {
             motor1.setPower(1);
+        } else if (gamepad1.a) {
+            motor1.setVelocity(0);
         }
         if (gamepad1.dpad_down) {
             Feed.setPower(-1.0);

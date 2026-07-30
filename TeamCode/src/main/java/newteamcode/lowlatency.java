@@ -16,5 +16,5 @@ public class lowlatency extends OpMode {
     @Override
     public void loop(){
         multi1.loop(gamepad1);
-        multi2.loop(gamepad1);
+        multi2.loop(gamepad1, telemetry);
     }}
