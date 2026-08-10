@@ -17,7 +17,14 @@ public class riljalan extends OpMode {
 
     @Override
     public void loop() {
-        fieldrive.drive(gamepad1);
+        boolean isP2Moving = Math.abs(gamepad2.left_stick_y) > 0.05 || 
+                             Math.abs(gamepad2.left_stick_x) > 0.05 || 
+                             Math.abs(gamepad2.right_stick_x) > 0.05;
+        if (isP2Moving) {
+            p2drive.drive(gamepad2);
+        } else {
+            fieldrive.drive(gamepad1);
+        }
 
         multi2.loop(gamepad2,telemetry);
     }
