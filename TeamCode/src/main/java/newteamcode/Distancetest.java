@@ -15,7 +15,7 @@ public class Distancetest extends LinearOpMode{
     @Override
     public void runOpMode() {
         // you can use this as a regular DistanceSensor.
-        sensorDistance = hardwareMap.get(DistanceSensor.class, "sensor_distance");
+        sensorDistance = hardwareMap.get(DistanceSensor.class, "dis");
 
         // you can also cast this to a Rev2mDistanceSensor if you want to use added
         // methods associated with the Rev2mDistanceSensor class.
@@ -28,7 +28,6 @@ public class Distancetest extends LinearOpMode{
         while(opModeIsActive()) {
             // generic DistanceSensor methods.
             telemetry.addData("deviceName", sensorDistance.getDeviceName() );
-            telemetry.addData("range", String.format("%.01f mm", sensorDistance.getDistance(DistanceUnit.MM)));
             telemetry.addData("range", String.format("%.01f cm", sensorDistance.getDistance(DistanceUnit.CM)));
 
             // Rev2mDistanceSensor specific methods.

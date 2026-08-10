@@ -1,16 +1,16 @@
 package newteamcode;
 
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.IMU;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 public class fieldrive {
-    public DcMotor FLmotor, FRmotor, BLmotor, BRmotor;
-    public IMU imu;
+    public DcMotor FLmotor, FRmotor, BLmotor, BRmotor,Intake;
 
     public static double EXPAND_SPEED_MULTIPLIER = 1.0;
+    double forward;
+    double strafe;
+    double rotate;
 
     public void init(HardwareMap hwmap){
         FLmotor = hwmap.get(DcMotor.class, "DTLF");
@@ -26,24 +26,16 @@ public class fieldrive {
         BLmotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         BRmotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        FLmotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        FRmotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        BLmotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        BRmotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        imu = hwmap.get(IMU.class, "imu");
-        RevHubOrientationOnRobot Revorientation = new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.DOWN,
-                RevHubOrientationOnRobot.UsbFacingDirection.LEFT);
-
-        imu.initialize(new IMU.Parameters(Revorientation));
+        Intake = hwmap.get(DcMotor.class, "Int");
     }
 
-    public void resetYaw() {
-        imu.resetYaw();
-    }
+    public void drive(Gamepad gamepad){
 
-    public void drive(double forward, double strafe, double rotate){
+        forward = gamepad.left_stick_y;
+        strafe = -gamepad.left_stick_x;
+        rotate = -gamepad.right_stick_x;
+
         double FLpower = forward + strafe + rotate;
         double BLpower = forward - strafe + rotate;
         double FRpower = forward - strafe - rotate;
@@ -61,6 +53,8 @@ public class fieldrive {
         BLmotor.setPower(maxspeed * (BLpower / maxpower));
         FRmotor.setPower(maxspeed * (FRpower / maxpower));
         BRmotor.setPower(maxspeed * (BRpower / maxpower));
+
+        Intake.setPower(gamepad.left_trigger - gamepad.right_trigger);
     }
 
     public void expand(double forward) {
