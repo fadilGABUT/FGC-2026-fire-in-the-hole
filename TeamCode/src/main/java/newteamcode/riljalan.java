@@ -13,6 +13,7 @@ public class riljalan extends OpMode {
     @Override
     public void init() {
         fieldrive.init(hardwareMap);
+        p2drive.init(hardwareMap);
         multi2.init(hardwareMap, telemetry);
     }
 

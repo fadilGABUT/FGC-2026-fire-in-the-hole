@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 public class p2drive {
     public DcMotor FLmotor, FRmotor, BLmotor, BRmotor;
 
-    public static double SPEED_MULTIPLIER = 0.2;
+    public static double SPEED_MULTIPLIER = 0.5;
 
     double forward;
     double strafe;
@@ -30,7 +30,7 @@ public class p2drive {
 
     public void drive(Gamepad gamepad){
         forward = -gamepad.left_stick_y * SPEED_MULTIPLIER;
-        strafe = -gamepad.left_stick_x * SPEED_MULTIPLIER;
+        strafe = gamepad.left_stick_x * SPEED_MULTIPLIER;
         rotate = -gamepad.right_stick_x * SPEED_MULTIPLIER;
 
         double FLpower = forward + strafe + rotate;
