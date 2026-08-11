@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 public class riljalan extends OpMode {
 
     fieldrive fieldrive = new fieldrive();
+    p2drive p2drive = new p2drive();
     multi2 multi2 = new multi2();
     @Override
     public void init() {
