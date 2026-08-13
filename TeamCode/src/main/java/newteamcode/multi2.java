@@ -19,13 +19,14 @@ public class multi2 {
     public static double minvelocity = 1400;
     private DistanceSensor sensorDistance;
 
-    public boolean lastRB = false, lastLB = false, shooterOn = false, feedOn = false;
+    public boolean lastRB = false, lastLB = false, shooterOn = false, feedOn = false, lastX = false, shooterReverseOn = false;
 
     public void init(HardwareMap hwmap, Telemetry telemetry) {
         sensorDistance = hwmap.get(DistanceSensor.class, "dis");
 
         ShooterL = hwmap.get(DcMotorEx.class, "ShooterL");
         ShooterL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+         ShooterL.setDirection(DcMotor.Direction.REVERSE);
         ShooterL.setVelocityPIDFCoefficients(1.622, 0.162, 0, 16.221);
         Feed = hwmap.get(DcMotor.class, "Feed");
 
@@ -39,18 +40,30 @@ public class multi2 {
         boolean currentRB = gamepad.right_bumper;
         if (currentRB && !lastRB) {
             shooterOn = !shooterOn;
+             if (shooterOn) {
+                shooterReverseOn = false;
+            }
         }
         lastRB = currentRB;
+       
+        boolean currentX = gamepad.x;
+        if (currentX && !lastX) {
+            shooterReverseOn = !shooterReverseOn;
+            if (shooterReverseOn) {
+                shooterOn = false; 
+            }
+        }
+        lastX = currentX;
 
         boolean currentLB = gamepad.left_bumper;
         if (currentLB && !lastLB) {
-            if (shooterOn) {
+            if (shooterOn || shooterReverseOn) {
                 feedOn = !feedOn;
             }
         }
         lastLB = currentLB;
 
-        if (!shooterOn) {
+        if (!shooterOn && !shooterReverseOn) {
             feedOn = false;
         }
 
@@ -70,8 +83,9 @@ public class multi2 {
             ShooterL.setVelocity(0);
         }
 
-        telemetry.addData("f", feedOn);
-        telemetry.addData("S", shooterOn);
+        telemetry.addData("Feed On", feedOn);
+        telemetry.addData("Shooter Forward", shooterOn);
+        telemetry.addData("Shooter Reverse", shooterReverseOn);
 
         FtcDashboard dashboard = FtcDashboard.getInstance();
         Telemetry dashboardTelemetry = dashboard.getTelemetry();
