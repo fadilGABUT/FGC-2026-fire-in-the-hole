@@ -17,6 +17,7 @@ public class multi2 {
     public DcMotor Feed;
     public static double highVelocity = 2100;
     public static double minvelocity = 1400;
+    public static double minreverseVelo = -1400;
     private DistanceSensor sensorDistance;
 
     public boolean lastRB = false, lastLB = false, shooterOn = false, feedOn = false, lastX = false, shooterReverseOn = false;
@@ -36,39 +37,102 @@ public class multi2 {
         telemetry.update();
     }
 
+    // public void loop(Gamepad gamepad, Telemetry telemetry) {
+    //     boolean currentRB = gamepad.right_bumper;
+    //     if (currentRB && !lastRB) {
+    //         shooterOn = !shooterOn;
+    //          if (shooterOn) {
+    //             shooterReverseOn = false;
+    //         }
+    //     }
+    //     lastRB = currentRB;
+       
+    //     boolean currentX = gamepad.x;
+    //     if (currentX && !lastX) {
+    //         shooterReverseOn = !shooterReverseOn;
+    //         if (shooterReverseOn) {
+    //             shooterOn = false; 
+    //         }
+    //     }
+    //     lastX = currentX;
+
+    //     boolean currentLB = gamepad.left_bumper;
+    //     if (currentLB && !lastLB) {
+    //         if (shooterOn || shooterReverseOn) {
+    //             feedOn = !feedOn;
+    //         }
+    //     }
+    //     lastLB = currentLB;
+
+    //     if (!shooterOn && !shooterReverseOn) {
+    //         feedOn = false;
+    //     }
+
+    //     if (feedOn) {
+
+    //         boolean isSpeedReady = false;
+    //         if (shooterOn) {
+    //         isSpeedReady = ShooterL.getVelocity() >= minvelocity;
+    //         } else if (shooterReverseOn) {
+                
+    //             isSpeedReady = ShooterL.getVelocity() <= minreverseVelo;
+    //         }
+    //         boolean isDistanceOK = sensorDistance.getDistance(DistanceUnit.CM) >= 30;
+
+    //     if (feedOn) {
+    //         if (isDistanceOK || isSpeedReady) {
+    //             Feed.setPower(1.0); 
+    //         } else {
+    //             Feed.setPower(0.0);
+    //         }
+    //     } else {
+    //         Feed.setPower(0.0);
+    //     }
+    //     } else {
+    //         Feed.setPower(0.0);
+    //     }
+    //     if (shooterOn) {
+    //         ShooterL.setVelocity(highVelocity);
+    //     } else if (shooterReverseOn) {
+    //         ShooterL.setVelocity(-highVelocity);
+    //     } else {
+    //         ShooterL.setVelocity(0);
+    //     }
+
+    //     telemetry.addData("Feed On", feedOn);
+    //     telemetry.addData("Shooter Forward", shooterOn);
+    //     telemetry.addData("Shooter Reverse", shooterReverseOn);
+
+    //     FtcDashboard dashboard = FtcDashboard.getInstance();
+    //     Telemetry dashboardTelemetry = dashboard.getTelemetry();
+    //     dashboardTelemetry.addData("ball", sensorDistance.getDistance(DistanceUnit.CM));
+    //     dashboardTelemetry.addData("velocity", ShooterL.getVelocity());
+    //     dashboardTelemetry.update();
+    // }
     public void loop(Gamepad gamepad, Telemetry telemetry) {
         boolean currentRB = gamepad.right_bumper;
         if (currentRB && !lastRB) {
             shooterOn = !shooterOn;
-             if (shooterOn) {
-                shooterReverseOn = false;
-            }
         }
         lastRB = currentRB;
-       
-        boolean currentX = gamepad.x;
-        if (currentX && !lastX) {
-            shooterReverseOn = !shooterReverseOn;
-            if (shooterReverseOn) {
-                shooterOn = false; 
-            }
-        }
-        lastX = currentX;
 
         boolean currentLB = gamepad.left_bumper;
         if (currentLB && !lastLB) {
-            if (shooterOn || shooterReverseOn) {
+            if (shooterOn) {
                 feedOn = !feedOn;
             }
         }
         lastLB = currentLB;
 
-        if (!shooterOn && !shooterReverseOn) {
+        if (!shooterOn) {
             feedOn = false;
         }
 
         if (feedOn) {
-            if (sensorDistance.getDistance(DistanceUnit.CM) >= 30 || ShooterL.getVelocity() >= minvelocity) {
+            boolean isSpeedReady = ShooterL.getVelocity() >= minvelocity;
+            boolean isDistanceOK = sensorDistance.getDistance(DistanceUnit.CM) >= 30;
+
+            if (isDistanceOK || isSpeedReady) {
                 Feed.setPower(1.0);
             } else {
                 Feed.setPower(0.0);
@@ -84,8 +148,7 @@ public class multi2 {
         }
 
         telemetry.addData("Feed On", feedOn);
-        telemetry.addData("Shooter Forward", shooterOn);
-        telemetry.addData("Shooter Reverse", shooterReverseOn);
+        telemetry.addData("Shooter On", shooterOn);
 
         FtcDashboard dashboard = FtcDashboard.getInstance();
         Telemetry dashboardTelemetry = dashboard.getTelemetry();
