@@ -1,8 +1,7 @@
 package newteamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
@@ -10,15 +9,12 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
 
-@TeleOp(name = "apriltag", group = "Opmode")
-public class apriltag extends OpMode {
+public class apriltagVision {
 
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
 
-    @Override
-    public void init() {
-
+    public void init(HardwareMap hardwareMap) {
         aprilTag = new AprilTagProcessor.Builder()
                 .build();
 
@@ -26,22 +22,15 @@ public class apriltag extends OpMode {
                 .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
                 .addProcessor(aprilTag)
                 .build();
-
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
     }
 
-    @Override
-    public void loop() {
-
-        List<AprilTagDetection> detections =
-                aprilTag.getDetections();
+    public void loop(Telemetry telemetry) {
+        List<AprilTagDetection> detections = aprilTag.getDetections();
 
         telemetry.addData("Status", "AprilTag Running");
         telemetry.addData("Tags Detected", detections.size());
 
         for (AprilTagDetection detection : detections) {
-
             telemetry.addData("ID", detection.id);
 
             if (detection.ftcPose != null) {
@@ -53,11 +42,8 @@ public class apriltag extends OpMode {
                 telemetry.addData("Roll", "%.2f", detection.ftcPose.roll);
             }
         }
-
-        telemetry.update();
     }
 
-    @Override
     public void stop() {
         if (visionPortal != null) {
             visionPortal.close();

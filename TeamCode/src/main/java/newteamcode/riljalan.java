@@ -3,18 +3,20 @@ package newteamcode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-
 @TeleOp(name = "riljalan", group = "TeleOp")
 public class riljalan extends OpMode {
 
     fieldrive fieldrive = new fieldrive();
     p2drive p2drive = new p2drive();
     multi2 multi2 = new multi2();
+    apriltagVision apriltag = new apriltagVision();
+
     @Override
     public void init() {
         fieldrive.init(hardwareMap);
         p2drive.init(hardwareMap);
         multi2.init(hardwareMap, telemetry);
+        apriltag.init(hardwareMap);
     }
 
     @Override
@@ -28,6 +30,12 @@ public class riljalan extends OpMode {
             fieldrive.drive(gamepad1);
         }
 
-        multi2.loop(gamepad2,telemetry);
+        multi2.loop(gamepad2, telemetry);
+        apriltag.loop(telemetry);
+    }
+
+    @Override
+    public void stop() {
+        apriltag.stop();
     }
 }
