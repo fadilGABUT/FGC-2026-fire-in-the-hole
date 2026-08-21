@@ -46,9 +46,9 @@ public class fieldrive {
 
     public void drive(Gamepad gamepad, boolean isFieldCentric) {
 
-        forward = gamepad.left_stick_y;
-        strafe = -gamepad.left_stick_x;
-        rotate = -gamepad.right_stick_x;
+        forward = -gamepad.left_stick_y;
+        strafe = gamepad.left_stick_x;
+        rotate = gamepad.right_stick_x;
 
         double rotForward = forward;
         double rotStrafe = strafe;
