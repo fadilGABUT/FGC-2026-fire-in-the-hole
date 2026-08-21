@@ -11,6 +11,9 @@ public class riljalan extends OpMode {
     multi2 multi2 = new multi2();
     apriltagVision apriltag = new apriltagVision();
 
+    boolean isFieldRelative = true; 
+    boolean lastOptionsState = false;
+
     @Override
     public void init() {
         fieldrive.init(hardwareMap);
@@ -21,17 +24,28 @@ public class riljalan extends OpMode {
 
     @Override
     public void loop() {
+        if (gamepad1.options && !lastOptionsState) {
+            isFieldRelative = !isFieldRelative;
+        }
+        lastOptionsState = gamepad1.options;
+
+        if (gamepad1.share) {
+            fieldrive.resetHeading();
+        }
+
         boolean isP2Moving = Math.abs(gamepad2.left_stick_y) > 0.05 || 
                              Math.abs(gamepad2.left_stick_x) > 0.05 || 
                              Math.abs(gamepad2.right_stick_x) > 0.05;
         if (isP2Moving) {
             p2drive.drive(gamepad2);
         } else {
-            fieldrive.drive(gamepad1);
+            fieldrive.drive(gamepad1, isFieldRelative);
         }
 
         multi2.loop(gamepad2, telemetry);
         apriltag.loop(telemetry);
+
+        telemetry.addData("Drive Mode", isFieldRelative ? "FIELD RELATIVE" : "ROBOT CENTRIC");
     }
 
     @Override
