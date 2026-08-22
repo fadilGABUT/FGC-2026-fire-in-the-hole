@@ -7,7 +7,13 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 public class p2drive {
     public DcMotor FLmotor, FRmotor, BLmotor, BRmotor;
 
-    public void init(HardwareMap hwmap) {
+    public static double SPEED_MULTIPLIER = 0.5;
+
+    double forward;
+    double strafe;
+    double rotate;
+
+    public void init(HardwareMap hwmap){
         FLmotor = hwmap.get(DcMotor.class, "DTLF");
         FRmotor = hwmap.get(DcMotor.class, "DTRF");
         BLmotor = hwmap.get(DcMotor.class, "DTLB");
@@ -22,10 +28,10 @@ public class p2drive {
         BRmotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
-    public void drive(Gamepad gamepad) {
-        double forward = gamepad.left_stick_y;
-        double strafe = -gamepad.left_stick_x;
-        double rotate = -gamepad.right_stick_x;
+    public void drive(Gamepad gamepad){
+        forward = -gamepad.left_stick_y * SPEED_MULTIPLIER;
+        strafe = gamepad.left_stick_x * SPEED_MULTIPLIER;
+        rotate = -gamepad.right_stick_x * SPEED_MULTIPLIER;
 
         double FLpower = forward + strafe + rotate;
         double BLpower = forward - strafe + rotate;
