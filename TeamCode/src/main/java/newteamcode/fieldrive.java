@@ -5,9 +5,12 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class fieldrive {
-    public DcMotor FLmotor, FRmotor, BLmotor, BRmotor,Intake;
+    public DcMotor FLmotor, FRmotor, BLmotor, BRmotor, Intake;
 
     public static double EXPAND_SPEED_MULTIPLIER = 1.0;
+    public static double DEADZONE = 0.05;
+    public static double EXPO_POWER = 3.0;
+
     double forward;
     double strafe;
     double rotate;
@@ -26,15 +29,13 @@ public class fieldrive {
         BLmotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         BRmotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-
         Intake = hwmap.get(DcMotor.class, "Int");
     }
 
     public void drive(Gamepad gamepad){
-
-        forward = gamepad.left_stick_y;
-        strafe = -gamepad.left_stick_x;
-        rotate = -gamepad.right_stick_x;
+        forward = processInput(gamepad.left_stick_y);
+        strafe  = processInput(-gamepad.left_stick_x);
+        rotate  = processInput(-gamepad.right_stick_x);
 
         double FLpower = forward + strafe + rotate;
         double BLpower = forward - strafe + rotate;
@@ -67,5 +68,12 @@ public class fieldrive {
         FRmotor.setPower(frPower);
         BLmotor.setPower(blPower);
         BRmotor.setPower(brPower);
+    }
+
+    private double processInput(double input) {
+        if (Math.abs(input) < DEADZONE) {
+            return 0.0;
+        }
+        return Math.signum(input) * Math.pow(Math.abs(input), EXPO_POWER);
     }
 }
