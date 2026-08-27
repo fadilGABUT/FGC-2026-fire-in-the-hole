@@ -49,4 +49,4 @@ public class pinwheeldrive {
 
         Intake.setPower(gamepad.right_trigger - gamepad.left_trigger);
     }
-}
+} 
