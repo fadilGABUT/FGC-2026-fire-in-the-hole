@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class TankDrive {
-    public DcMotor DTL, DTR, Intake;
+    public DcMotor DTL, DTR, Intake1, Intake2;
 
     public static double DEADZONE = 0.05;
     public static double EXPO_POWER = 3.0;
@@ -16,7 +16,10 @@ public class TankDrive {
     public void init(HardwareMap hwmap) {
         DTL = hwmap.get(DcMotor.class, "DTL");
         DTR = hwmap.get(DcMotor.class, "DTR");
-        Intake = hwmap.get(DcMotor.class, "Int");
+        Intake1 = hwmap.get(DcMotor.class, "Int1");
+        Intake2 = hwmap.get(DcMotor.class, "Int2");
+        Intake1.setDirection(DcMotor.Direction.FORWARD);
+        Intake2.setDirection(DcMotor.Direction.REVERSE);
 
         DTL.setDirection(DcMotor.Direction.REVERSE);
         DTR.setDirection(DcMotor.Direction.FORWARD);
@@ -41,7 +44,8 @@ public class TankDrive {
         DTL.setPower(leftPower);
         DTR.setPower(rightPower);
 
-        Intake.setPower(gamepad.right_trigger - gamepad.left_trigger);
+        Intake1.setPower(gamepad.right_trigger - gamepad.left_trigger);
+        Intake2.setPower(gamepad.right_trigger - gamepad.left_trigger);
     }
 
     private double processInput(double input) {

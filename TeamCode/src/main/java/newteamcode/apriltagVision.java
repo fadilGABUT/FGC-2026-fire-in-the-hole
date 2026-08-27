@@ -29,6 +29,17 @@ public class apriltagVision {
                 .build();
     }
 
+    public AprilTagDetection getDetectionById(int targetId) {
+        if (aprilTag == null) return null;
+        List<AprilTagDetection> detections = aprilTag.getDetections();
+        for (AprilTagDetection detection : detections) {
+            if (detection.metadata != null && detection.id == targetId) {
+                return detection;
+            }
+        }
+        return null;
+    }
+
     public void loop(Telemetry telemetry) {
         List<AprilTagDetection> detections = aprilTag.getDetections();
 
