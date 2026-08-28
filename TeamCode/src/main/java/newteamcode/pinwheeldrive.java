@@ -14,29 +14,39 @@ public class pinwheeldrive {
         DTY1   = hwmap.get(DcMotor.class, "DTY1");
         DTY2   = hwmap.get(DcMotor.class, "DTY2");
         Intake = hwmap.get(DcMotor.class, "Int");
-        
 
         DTX1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         DTX2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         DTY1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         DTY2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        DTX1.setDirection(DcMotor.Direction.REVERSE);
-        DTY1.setDirection(DcMotor.Direction.REVERSE);
+
+        DTX2.setDirection(DcMotor.Direction.REVERSE);
+        DTY2.setDirection(DcMotor.Direction.REVERSE);
+        Intake.setDirection(DcMotor.Direction.REVERSE);
     }
 
     public void drive(Gamepad gamepad) {
-        double forward = gamepad.left_stick_y;
-        double strafe  = -gamepad.left_stick_x;
-        double rotate  = -gamepad.right_stick_x;
+        double rawY = -gamepad.left_stick_y;
+        double rawX = gamepad.left_stick_x;
+        double rotate = gamepad.right_stick_x;
 
-        forward = Math.pow(forward, 3);
-        strafe  = Math.pow(strafe, 3);
-        rotate  = Math.pow(rotate, 3);
+        double magnitude = Math.hypot(rawX, rawY);
+        double curvedMagnitude = Math.pow(magnitude, 3);
+
+        double forward = 0;
+        double strafe = 0;
+
+        if (magnitude > 0) {
+            forward = (rawY / magnitude) * curvedMagnitude;
+            strafe  = (rawX / magnitude) * curvedMagnitude;
+        }
+
+        rotate = Math.pow(rotate, 3);
 
         double dtx1Power = strafe + rotate;
         double dtx2Power = strafe - rotate;
-        double dty1Power = forward - rotate;
-        double dty2Power = forward + rotate;
+        double dty1Power = forward + rotate;
+        double dty2Power = forward - rotate;
 
         double maxPower = Math.max(1.0, Math.max(Math.abs(dtx1Power),
                           Math.max(Math.abs(dtx2Power),
